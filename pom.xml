@@ -9,6 +9,7 @@
   <name>Simple JSON Parser and Formatter</name>
   <description>Simple parser and formatter for JSON</description>
   <packaging>jar</packaging>
+  <url>https://github.com/pwall567/json-simple</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,6 +23,11 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
+  <scm>
+    <connection>scm:git:git://github.com/pwall567/json-simple.git</connection>
+    <url>https://github.com/pwall567/json-simple.git</url>
+  </scm>
 
   <developers>
     <developer>
