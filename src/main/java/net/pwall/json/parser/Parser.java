@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import net.pwall.json.JSONFunctions;
 import net.pwall.text.TextMatcher;
 import net.pwall.util.ImmutableList;
 import net.pwall.util.ImmutableMap;
@@ -52,10 +53,6 @@ public class Parser {
     public static final String MISSING_COLON = "Missing colon in JSON object";
     public static final String MISSING_CLOSING_BRACE = "Missing closing brace in JSON object";
     public static final String MISSING_CLOSING_BRACKET = "Missing closing bracket in JSON array";
-    public static final String UNTERMINATED_STRING = "Unterminated JSON string";
-    public static final String ILLEGAL_CHAR = "Illegal character in JSON string";
-    public static final String ILLEGAL_UNICODE_SEQUENCE = "Illegal Unicode sequence in JSON string";
-    public static final String ILLEGAL_ESCAPE_SEQUENCE = "Illegal escape sequence in JSON string";
 
     /**
      * Parse a string of JSON and return a value of type <b><i>J</i></b> (not an actual parameterised type), where
@@ -87,7 +84,7 @@ public class Parser {
     public static Object parse(String json) {
         TextMatcher tm = new TextMatcher(json);
         Object result = parse(tm, ROOT_POINTER);
-        tm.skip(Parser::isSpaceCharacter);
+        tm.skip(JSONFunctions::isSpaceCharacter);
         if (!tm.isAtEnd())
             throw new ParseException(EXCESS_CHARS);
         return result;
@@ -104,12 +101,12 @@ public class Parser {
      * @throws  ParseException  if there are any errors in the JSON
      */
     private static Object parse(TextMatcher tm, String pointer) {
-        tm.skip(Parser::isSpaceCharacter);
+        tm.skip(JSONFunctions::isSpaceCharacter);
 
         if (tm.match('{')) {
             ImmutableMap.MapEntry<String, Object>[] array = ImmutableMap.createArray(8);
             int index = 0;
-            tm.skip(Parser::isSpaceCharacter);
+            tm.skip(JSONFunctions::isSpaceCharacter);
             if (!tm.match('}')) {
                 while (true) {
                     if (!tm.match('"'))
@@ -117,7 +114,7 @@ public class Parser {
                     String key = parseString(tm, pointer);
                     if (ImmutableMap.containsKey(array, index, key))
                         throw new ParseException(DUPLICATE_KEY, pointer);
-                    tm.skip(Parser::isSpaceCharacter);
+                    tm.skip(JSONFunctions::isSpaceCharacter);
                     if (!tm.match(':'))
                         throw new ParseException(MISSING_COLON, pointer);
                     if (index == array.length) {
@@ -127,21 +124,21 @@ public class Parser {
                         array = newArray;
                     }
                     array[index++] = ImmutableMap.entry(key, parse(tm, pointer + '/' + key));
-                    tm.skip(Parser::isSpaceCharacter);
+                    tm.skip(JSONFunctions::isSpaceCharacter);
                     if (!tm.match(','))
                         break;
-                    tm.skip(Parser::isSpaceCharacter);
+                    tm.skip(JSONFunctions::isSpaceCharacter);
                 }
                 if (!tm.match('}'))
                     throw new ParseException(MISSING_CLOSING_BRACE, pointer);
             }
-            return new ImmutableMap<>(array, index);
+            return ImmutableMap.mapOf(array, index);
         }
 
         if (tm.match('[')) {
             Object[] array = new Object[16];
             int index = 0;
-            tm.skip(Parser::isSpaceCharacter);
+            tm.skip(JSONFunctions::isSpaceCharacter);
             if (!tm.match(']')) {
                 do {
                     if (index == array.length) {
@@ -151,7 +148,7 @@ public class Parser {
                     }
                     array[index] = parse(tm, pointer + '/' + index);
                     index++;
-                    tm.skip(Parser::isSpaceCharacter);
+                    tm.skip(JSONFunctions::isSpaceCharacter);
                 } while (tm.match(','));
                 if (!tm.match(']'))
                     throw new ParseException(MISSING_CLOSING_BRACKET, pointer);
@@ -218,69 +215,12 @@ public class Parser {
      * @throws  ParseException  if there are any errors in the JSON
      */
     private static String parseString(TextMatcher tm, String pointer) {
-        int start = tm.getIndex();
-        while (true) {
-            if (tm.isAtEnd())
-                throw new ParseException(UNTERMINATED_STRING, pointer);
-            char ch = tm.nextChar();
-            if (ch == '"')
-                return tm.getString(start, tm.getStart());
-            if (ch == '\\')
-                break;
-            if (ch < 0x20)
-                throw new ParseException(ILLEGAL_CHAR, pointer);
+        try {
+            return JSONFunctions.parseString(tm);
         }
-        StringBuilder sb = new StringBuilder(tm.getCharSeq(start, tm.getStart()));
-        while (true) {
-            if (tm.isAtEnd())
-                throw new ParseException(UNTERMINATED_STRING, pointer);
-            char ch = tm.nextChar();
-            if (ch == '"')
-                sb.append('"');
-            else if (ch == '\\')
-                sb.append('\\');
-            else if (ch == '/')
-                sb.append('/');
-            else if (ch == 'b')
-                sb.append('\b');
-            else if (ch == 'f')
-                sb.append('\f');
-            else if (ch == 'n')
-                sb.append('\n');
-            else if (ch == 'r')
-                sb.append('\r');
-            else if (ch == 't')
-                sb.append('\t');
-            else if (ch == 'u') {
-                if (!tm.matchHex(4, 4))
-                    throw new ParseException(ILLEGAL_UNICODE_SEQUENCE, pointer);
-                sb.append((char)tm.getResultHexInt());
-            }
-            else
-                throw new ParseException(ILLEGAL_ESCAPE_SEQUENCE, pointer);
-            while (true) {
-                if (tm.isAtEnd())
-                    throw new ParseException(UNTERMINATED_STRING, pointer);
-                ch = tm.nextChar();
-                if (ch == '"')
-                    return sb.toString();
-                if (ch == '\\')
-                    break;
-                if (ch < 0x20)
-                    throw new ParseException(ILLEGAL_CHAR, pointer);
-                sb.append(ch);
-            }
+        catch (IllegalArgumentException iae) {
+            throw new ParseException(iae.getMessage(), pointer);
         }
-    }
-
-    /**
-     * Test whether a given character is a space, according to the JSON specification.
-     *
-     * @param   ch          the character
-     * @return              {@code true} if the character is a space
-     */
-    private static boolean isSpaceCharacter(int ch) {
-        return ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r';
     }
 
 }

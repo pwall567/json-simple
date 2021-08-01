@@ -18,13 +18,13 @@ To parse a string of JSON to a simple structure consisting solely of standard Ja
         Object structure = JSONSimple.parse(json);
 ```
 The structure will consist of:
-- a [Map] (for JSON objects)
-- a [List] (for JSON arrays)
-- a [String] (for JSON strings)
-- an [Integer] (for JSON integers up to 32 bits)
-- a [Long] (for JSON integers 32-64 bits)
-- a [BigDecimal] (for other JSON numbers, including floating point)
-- a [Boolean] (for JSON booleans)
+- a `Map` (for JSON objects)
+- a `List` (for JSON arrays)
+- a `String` (for JSON strings)
+- an `Integer` (for JSON integers up to 32 bits)
+- a `Long` (for JSON integers 32-64 bits)
+- a `BigDecimal` (for other JSON numbers, including floating point)
+- a `Boolean` (for JSON booleans)
 - `null` (for the JSON null values using the `null` keyword)
 
 To format an object like the one returned by a `parse()` operation:
@@ -36,23 +36,23 @@ See the JavaDoc for more information, including changing the indentaton size and
 
 ## Dependency Specification
 
-The latest version of the library is 1.0, and it may be obtained from the Maven Central repository.
+The latest version of the library is 1.1, and it may be obtained from the Maven Central repository.
 
 ### Maven
 ```xml
     <dependency>
       <groupId>net.pwall.json</groupId>
       <artifactId>json-simple</artifactId>
-      <version>1.0</version>
+      <version>1.1</version>
     </dependency>
 ```
 ### Gradle
 ```groovy
-    testImplementation 'net.pwall.json:json-simple:1.0'
+    implementation 'net.pwall.json:json-simple:1.1'
 ```
 ### Gradle (kts)
 ```kotlin
-    testImplementation("net.pwall.json:json-simple:1.0")
+    implementation("net.pwall.json:json-simple:1.1")
 ```
 
 Peter Wall

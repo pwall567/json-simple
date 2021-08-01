@@ -31,6 +31,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import net.pwall.json.JSONFunctions;
+
 /**
  * JSON Formatter - formats a data structure as JSON using the specified indentation and line termination settings.
  * Objects are converted as follows:
@@ -66,36 +68,6 @@ public class Formatter {
     public static final int defaultIndent = 2;
     public static final String systemLineSeparator = System.getProperty("line.separator");
     public static final String unixLineSeparator = "\n";
-
-    private static final char[] digits = {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-    };
-
-    private static final char[] tensDigits = {
-            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
-            '1', '1', '1', '1', '1', '1', '1', '1', '1', '1',
-            '2', '2', '2', '2', '2', '2', '2', '2', '2', '2',
-            '3', '3', '3', '3', '3', '3', '3', '3', '3', '3',
-            '4', '4', '4', '4', '4', '4', '4', '4', '4', '4',
-            '5', '5', '5', '5', '5', '5', '5', '5', '5', '5',
-            '6', '6', '6', '6', '6', '6', '6', '6', '6', '6',
-            '7', '7', '7', '7', '7', '7', '7', '7', '7', '7',
-            '8', '8', '8', '8', '8', '8', '8', '8', '8', '8',
-            '9', '9', '9', '9', '9', '9', '9', '9', '9', '9'
-    };
-
-    private static final char[] hexDigits = {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-    };
 
     private static final Formatter defaultFormatter = new Formatter();
 
@@ -242,7 +214,7 @@ public class Formatter {
                     Map.Entry<?, ?> entry = iterator.next();
                     int newIndent = currentIndent + indent;
                     appendSpaces(a, newIndent);
-                    appendString(a, entry.getKey().toString());
+                    JSONFunctions.appendString(a, entry.getKey().toString(), false);
                     a.append(':');
                     a.append(' ');
                     formatTo(a, entry.getValue(), newIndent);
@@ -339,7 +311,7 @@ public class Formatter {
                 Iterator<? extends Map.Entry<?, ?>> iterator = map.entrySet().iterator();
                 while (true) {
                     Map.Entry<?, ?> entry = iterator.next();
-                    appendString(a, entry.getKey().toString());
+                    JSONFunctions.appendString(a, entry.getKey().toString(), false);
                     a.append(':');
                     outputTo(a, entry.getValue());
                     if (!iterator.hasNext())
@@ -394,153 +366,20 @@ public class Formatter {
      * @throws  IOException if thrown by the {@link Appendable}
      */
     public static void appendPrimitive(Appendable a, Object value) throws IOException {
-        if (value instanceof Integer) {
-            appendInt(a, (int)value);
-        }
-        else if (value instanceof Long) {
-            appendLong(a, (long)value);
-        }
-        else if (value instanceof Number) {
+        if (value instanceof Integer)
+            JSONFunctions.appendInt(a, (int)value);
+        else if (value instanceof Long)
+            JSONFunctions.appendLong(a, (long)value);
+        else if (value instanceof Number)
             a.append(value.toString());
-        }
-        else if (value instanceof CharSequence) {
-            appendString(a, (CharSequence)value);
-        }
+        else if (value instanceof CharSequence)
+            JSONFunctions.appendString(a, (CharSequence)value, false);
         else {
             String s = value.toString();
             if (s.equals("true") || s.equals("false")) // Boolean, or Boolean-like
                 a.append(s);
             else
-                appendString(a, s);
-        }
-    }
-
-    /**
-     * Append a {@link CharSequence} to an {@link Appendable} in JSON quoted string form (with non-ASCII characters
-     * escaped).
-     *
-     * @param   a           the {@link Appendable}
-     * @param   cs          the {@link CharSequence}
-     * @throws  IOException if thrown by the {@link Appendable}
-     */
-    public static void appendString(Appendable a, CharSequence cs) throws IOException {
-        a.append('"');
-        for (int i = 0, n = cs.length(); i < n; i++) {
-            char ch = cs.charAt(i);
-            if (ch == '"' || ch == '\\') {
-                a.append('\\');
-                a.append(ch);
-            }
-            else if (ch == '\b')
-                a.append("\\b");
-            else if (ch == '\f')
-                a.append("\\f");
-            else if (ch == '\n')
-                a.append("\\n");
-            else if (ch == '\r')
-                a.append("\\r");
-            else if (ch == '\t')
-                a.append("\\t");
-            else if (ch < 0x20 || ch >= 0x7F) {
-                a.append("\\u");
-                a.append(hexDigits[(ch >> 12) & 0xF]);
-                a.append(hexDigits[(ch >> 8) & 0xF]);
-                a.append(hexDigits[(ch >> 4) & 0xF]);
-                a.append(hexDigits[ch & 0xF]);
-            }
-            else
-                a.append(ch);
-        }
-        a.append('"');
-    }
-
-    /**
-     * Append an {@code int} to an {@link Appendable}.  This method outputs the digits left to right, avoiding the need
-     * to allocate a separate buffer.
-     *
-     * @param   a           the {@link Appendable}
-     * @param   i           the {@code int}
-     * @throws  IOException if thrown by the {@link Appendable}
-     */
-    public static void appendInt(Appendable a, int i) throws IOException {
-        if (i < 0) {
-            if (i == Integer.MIN_VALUE)
-                a.append("-2147483648");
-            else {
-                a.append('-');
-                appendPositiveInt(a, -i);
-            }
-        }
-        else
-            appendPositiveInt(a, i);
-    }
-
-    /**
-     * Append a positive {@code int} to an {@link Appendable}.  This method outputs the digits left to right, avoiding
-     * the need to allocate a separate buffer.
-     *
-     * @param   a           the {@link Appendable}
-     * @param   i           the {@code int}
-     * @throws  IOException if thrown by the {@link Appendable}
-     */
-    public static void appendPositiveInt(Appendable a, int i) throws IOException {
-        if (i >= 100) {
-            int n = i / 100;
-            appendPositiveInt(a, n);
-            i -= n * 100;
-            a.append(tensDigits[i]);
-            a.append(digits[i]);
-        }
-        else if (i >= 10) {
-            a.append(tensDigits[i]);
-            a.append(digits[i]);
-        }
-        else
-            a.append(digits[i]);
-    }
-
-    /**
-     * Append a {@code long} to an {@link Appendable}.  This method outputs the digits left to right, avoiding the need
-     * to allocate a separate buffer.
-     *
-     * @param   a           the {@link Appendable}
-     * @param   n           the {@code long}
-     * @throws  IOException if thrown by the {@link Appendable}
-     */
-    public static void appendLong(Appendable a, long n) throws IOException {
-        if (n < 0) {
-            if (n == Long.MIN_VALUE)
-                a.append("-9223372036854775808");
-            else {
-                a.append('-');
-                appendPositiveLong(a, -n);
-            }
-        }
-        else
-            appendPositiveLong(a, n);
-    }
-
-    /**
-     * Append a positive {@code long} to an {@link Appendable}.  This method outputs the digits left to right, avoiding
-     * the need to allocate a separate buffer.
-     *
-     * @param   a           the {@link Appendable}
-     * @param   n           the {@code long}
-     * @throws  IOException if thrown by the {@link Appendable}
-     */
-    public static void appendPositiveLong(Appendable a, long n) throws IOException {
-        if (n >= 100) {
-            long m = n / 100;
-            appendPositiveLong(a, m);
-            int i = (int)(n - m * 100);
-            a.append(tensDigits[i]);
-            a.append(digits[i]);
-        }
-        else {
-            int i = (int)n;
-            if (i >= 10)
-                a.append(tensDigits[i]);
-            a.append(digits[i]);
+                JSONFunctions.appendString(a, s, false);
         }
     }
 

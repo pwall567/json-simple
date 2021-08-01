@@ -45,7 +45,7 @@ public class ParserStringTest {
     }
 
     @Test
-    public void shouldParseStringWithUnicodeEscapeSequences() {
+    public void shouldParseStringWithUnicodeEscapeSequence() {
         assertEquals("mdash \u2014", Parser.parse("\"mdash \\u2014\""));
     }
 
