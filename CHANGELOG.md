@@ -2,6 +2,10 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.2] - 2021-08-24
+### Changed
+- `pom.xml`: bumped dependency version
+
 ## [1.1] - 2021-07-29
 ### Changed
 - `Formatter`, `Parser`: changed to use `json-functions` library
