@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import net.pwall.json.JSONFunctions;
+import net.pwall.util.IntOutput;
 
 /**
  * JSON Formatter - formats a data structure as JSON using the specified indentation and line termination settings.
@@ -367,9 +368,9 @@ public class Formatter {
      */
     public static void appendPrimitive(Appendable a, Object value) throws IOException {
         if (value instanceof Integer)
-            JSONFunctions.appendInt(a, (int)value);
+            IntOutput.appendInt(a, (int)value);
         else if (value instanceof Long)
-            JSONFunctions.appendLong(a, (long)value);
+            IntOutput.appendLong(a, (long)value);
         else if (value instanceof Number)
             a.append(value.toString());
         else if (value instanceof CharSequence)
