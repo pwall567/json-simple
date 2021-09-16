@@ -32,29 +32,29 @@ To format an object like the one returned by a `parse()` operation:
         String formatted = JSONSimple.format(structure);
 ```
 
-See the JavaDoc for more information, including changing the indentaton size and line terminator.
+See the JavaDoc for more information, including changing the indentation size and line terminator.
 
 ## Dependency Specification
 
-The latest version of the library is 1.3, and it may be obtained from the Maven Central repository.
+The latest version of the library is 1.3.1, and it may be obtained from the Maven Central repository.
 
 ### Maven
 ```xml
     <dependency>
       <groupId>net.pwall.json</groupId>
       <artifactId>json-simple</artifactId>
-      <version>1.3</version>
+      <version>1.3.1</version>
     </dependency>
 ```
 ### Gradle
 ```groovy
-    implementation 'net.pwall.json:json-simple:1.3'
+    implementation 'net.pwall.json:json-simple:1.3.1'
 ```
 ### Gradle (kts)
 ```kotlin
-    implementation("net.pwall.json:json-simple:1.3")
+    implementation("net.pwall.json:json-simple:1.3.1")
 ```
 
 Peter Wall
 
-2021-08-25
+2021-09-16
