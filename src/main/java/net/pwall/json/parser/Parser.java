@@ -2,7 +2,7 @@
  * @(#) Parser.java
  *
  * json-simple  Simple JSON Parser and Formatter
- * Copyright (c) 2021 Peter Wall
+ * Copyright (c) 2021, 2022 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ import net.pwall.json.JSONFunctions;
 import net.pwall.text.TextMatcher;
 import net.pwall.util.ImmutableList;
 import net.pwall.util.ImmutableMap;
+import net.pwall.util.ImmutableMapEntry;
 
 /**
  * A simple JSON parser.  This class consists of static functions that parse JSON into standard Java classes, avoiding
@@ -104,7 +105,7 @@ public class Parser {
         tm.skip(JSONFunctions::isSpaceCharacter);
 
         if (tm.match('{')) {
-            ImmutableMap.MapEntry<String, Object>[] array = ImmutableMap.createArray(8);
+            ImmutableMapEntry<String, Object>[] array = ImmutableMap.createArray(8);
             int index = 0;
             tm.skip(JSONFunctions::isSpaceCharacter);
             if (!tm.match('}')) {
@@ -118,7 +119,7 @@ public class Parser {
                     if (!tm.match(':'))
                         throw new ParseException(MISSING_COLON, pointer);
                     if (index == array.length) {
-                        ImmutableMap.MapEntry<String, Object>[] newArray =
+                        ImmutableMapEntry<String, Object>[] newArray =
                                 ImmutableMap.createArray(array.length + Math.min(array.length, 4096));
                         System.arraycopy(array, 0, newArray, 0, array.length);
                         array = newArray;
