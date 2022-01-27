@@ -36,25 +36,25 @@ See the JavaDoc for more information, including changing the indentation size an
 
 ## Dependency Specification
 
-The latest version of the library is 1.4, and it may be obtained from the Maven Central repository.
+The latest version of the library is 1.5, and it may be obtained from the Maven Central repository.
 
 ### Maven
 ```xml
     <dependency>
       <groupId>net.pwall.json</groupId>
       <artifactId>json-simple</artifactId>
-      <version>1.4</version>
+      <version>1.5</version>
     </dependency>
 ```
 ### Gradle
 ```groovy
-    implementation 'net.pwall.json:json-simple:1.4'
+    implementation 'net.pwall.json:json-simple:1.5'
 ```
 ### Gradle (kts)
 ```kotlin
-    implementation("net.pwall.json:json-simple:1.4")
+    implementation("net.pwall.json:json-simple:1.5")
 ```
 
 Peter Wall
 
-2022-01-21
+2022-01-27
