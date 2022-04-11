@@ -5,7 +5,7 @@
 
   <groupId>net.pwall.json</groupId>
   <artifactId>json-simple</artifactId>
-  <version>1.5</version>
+  <version>1.5.1</version>
   <name>Simple JSON Parser and Formatter</name>
   <description>Simple parser and formatter for JSON</description>
   <packaging>jar</packaging>
@@ -56,12 +56,12 @@
     <dependency>
       <groupId>net.pwall.json</groupId>
       <artifactId>json-functions</artifactId>
-      <version>1.4</version>
+      <version>1.4.1</version>
     </dependency>
     <dependency>
       <groupId>net.pwall.util</groupId>
       <artifactId>int-output</artifactId>
-      <version>1.1</version>
+      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>net.pwall.text</groupId>
