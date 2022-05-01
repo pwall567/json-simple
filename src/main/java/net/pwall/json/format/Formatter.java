@@ -58,8 +58,9 @@ import net.pwall.util.IntOutput;
  * </dl>
  * This is a superset of the output of the {@link net.pwall.json.parser.Parser Parser} class, so this class may be
  * used as a complement to that one - to output structures created by that class or to create JSON data to be read
- * by it.  It also works well with the {@code JSONValue} structures produced by the {@code JSON.parse()} function of the
- * <a href="https://github.com/pwall567/jsonutil">jsonutil</a> library.  It may also work for other similar data
+ * by it.  It also works well with the {@code JSONValue} structures produced by the {@code JSON.parse()} functions of
+ * the <a href="https://github.com/pwall567/jsonutil">jsonutil</a> and
+ * <a href="https://github.com/pwall567/kjson-core">kjson-core</a> libraries.  It may also work for other similar data
  * structures, but the results in such cases are not guaranteed.
  *
  * @author  Peter Wall
