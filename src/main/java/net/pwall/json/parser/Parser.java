@@ -39,6 +39,28 @@ import net.pwall.util.ImmutableMapEntry;
  * A simple JSON parser.  This class consists of static functions that parse JSON into standard Java classes, avoiding
  * the need for additional class definitions.
  *
+ * The {@code parse} functions return a value of type <b><i>J</i></b> (not an actual parameterised type), where
+ * <b><i>J</i></b> is one of the following:
+ *
+ * <dl>
+ *   <dt>{@link String}</dt>
+ *   <dd>for a JSON string</dd>
+ *   <dt>{@link Integer}</dt>
+ *   <dd>for a JSON integer, up to 32 bits</dd>
+ *   <dt>{@link Long}</dt>
+ *   <dd>for a JSON integer, 33 to 64 bits</dd>
+ *   <dt>{@link BigDecimal}</dt>
+ *   <dd>for all other JSON numbers, including floating point</dd>
+ *   <dt>{@link Boolean}</dt>
+ *   <dd>for the JSON keywords {@code true} and {@code false}</dd>
+ *   <dt>{@link List}&lt;<b><i>J</i></b>&gt;</dt>
+ *   <dd>for a JSON array</dd>
+ *   <dt>{@link Map}&lt;{@link String}, <b><i>J</i></b>&gt;</dt>
+ *   <dd>for a JSON object</dd>
+ *   <dt>{@code null}</dt>
+ *   <dd>for the JSON keyword {@code null}</dd>
+ * </dl>
+ *
  * @author  Peter Wall
  */
 public class Parser {
@@ -55,36 +77,32 @@ public class Parser {
     public static final String MISSING_CLOSING_BRACE = "Missing closing brace in JSON object";
     public static final String MISSING_CLOSING_BRACKET = "Missing closing bracket in JSON array";
 
+    private static final ParseOptions defaultOptions =
+            new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, false, false);
+
     /**
-     * Parse a string of JSON and return a value of type <b><i>J</i></b> (not an actual parameterised type), where
-     * <b><i>J</i></b> is one of the following:
-     *
-     * <dl>
-     *   <dt>{@link String}</dt>
-     *   <dd>for a JSON string</dd>
-     *   <dt>{@link Integer}</dt>
-     *   <dd>for a JSON integer, up to 32 bits</dd>
-     *   <dt>{@link Long}</dt>
-     *   <dd>for a JSON integer, 33 to 64 bits</dd>
-     *   <dt>{@link BigDecimal}</dt>
-     *   <dd>for all other JSON numbers, including floating point</dd>
-     *   <dt>{@link Boolean}</dt>
-     *   <dd>for the JSON keywords {@code true} and {@code false}</dd>
-     *   <dt>{@link List}&lt;<b><i>J</i></b>&gt;</dt>
-     *   <dd>for a JSON array</dd>
-     *   <dt>{@link Map}&lt;{@link String}, <b><i>J</i></b>&gt;</dt>
-     *   <dd>for a JSON object</dd>
-     *   <dt>{@code null}</dt>
-     *   <dd>for the JSON keyword {@code null}</dd>
-     * </dl>
+     * Parse a string of JSON and return a value as described in the class documentation.
      *
      * @param   json            the JSON string
-     * @return                  the object, as described above
+     * @return                  the parsed object
      * @throws  ParseException  if there are any errors in the JSON
      */
     public static Object parse(String json) {
+        return parse(json, defaultOptions);
+    }
+
+    /**
+     * Parse a string of JSON and return a value as described in the class documentation, using a {@link ParseOptions}
+     * object to specify non-standard parsing options.
+     *
+     * @param   json            the JSON string
+     * @param   options         a {@link ParseOptions} object
+     * @return                  the parsed object
+     * @throws  ParseException  if there are any errors in the JSON
+     */
+    public static Object parse(String json, ParseOptions options) {
         TextMatcher tm = new TextMatcher(json);
-        Object result = parse(tm, ROOT_POINTER);
+        Object result = parse(tm, options, ROOT_POINTER);
         tm.skip(JSONFunctions::isSpaceCharacter);
         if (!tm.isAtEnd())
             throw new ParseException(EXCESS_CHARS);
@@ -101,7 +119,7 @@ public class Parser {
      * @return                  the JSON element
      * @throws  ParseException  if there are any errors in the JSON
      */
-    private static Object parse(TextMatcher tm, String pointer) {
+    private static Object parse(TextMatcher tm, ParseOptions options, String pointer) {
         tm.skip(JSONFunctions::isSpaceCharacter);
 
         if (tm.match('{')) {
@@ -110,11 +128,13 @@ public class Parser {
             tm.skip(JSONFunctions::isSpaceCharacter);
             if (!tm.match('}')) {
                 while (true) {
-                    if (!tm.match('"'))
+                    String key;
+                    if (tm.match('"'))
+                        key = parseString(tm, pointer);
+                    else if (options.getObjectKeyUnquoted() && matchIdentifier(tm))
+                        key = tm.getResult();
+                    else
                         throw new ParseException(ILLEGAL_KEY, pointer);
-                    String key = parseString(tm, pointer);
-                    if (ImmutableMap.containsKey(array, index, key))
-                        throw new ParseException(DUPLICATE_KEY, pointer);
                     tm.skip(JSONFunctions::isSpaceCharacter);
                     if (!tm.match(':'))
                         throw new ParseException(MISSING_COLON, pointer);
@@ -124,7 +144,24 @@ public class Parser {
                         System.arraycopy(array, 0, newArray, 0, array.length);
                         array = newArray;
                     }
-                    array[index++] = ImmutableMap.entry(key, parse(tm, pointer + '/' + key));
+                    Object value = parse(tm, options, pointer + '/' + key);
+                    int i = ImmutableMap.findKey(array, index, key);
+                    if (i >= 0) {
+                        switch (options.getObjectKeyDuplicate()) {
+                            case ERROR:
+                                duplicateKey(key, pointer);
+                            case CHECK_IDENTICAL:
+                                if (!array[i].getValue().equals(value))
+                                    duplicateKey(key, pointer);
+                                break;
+                            case TAKE_LAST:
+                                System.arraycopy(array, i + 1, array, i, index - 1);
+                                array[index - 1] = ImmutableMap.entry(key, value);
+                            // case TAKE_FIRST does nothing
+                        }
+                    }
+                    else
+                        array[index++] = ImmutableMap.entry(key, value);
                     tm.skip(JSONFunctions::isSpaceCharacter);
                     if (!tm.match(','))
                         break;
@@ -147,7 +184,7 @@ public class Parser {
                         System.arraycopy(array, 0, newArray, 0, array.length);
                         array = newArray;
                     }
-                    array[index] = parse(tm, pointer + '/' + index);
+                    array[index] = parse(tm, options, pointer + '/' + index);
                     index++;
                     tm.skip(JSONFunctions::isSpaceCharacter);
                 } while (tm.match(','));
@@ -222,6 +259,19 @@ public class Parser {
         catch (IllegalArgumentException iae) {
             throw new ParseException(iae.getMessage(), pointer);
         }
+    }
+
+    private static void duplicateKey(String key, String pointer) {
+        throw new ParseException(DUPLICATE_KEY + " \"" + key + '"', pointer);
+    }
+
+    private static boolean matchIdentifier(TextMatcher tm) {
+        int identifierStart = tm.getIndex();
+        if (!tm.match(ch -> ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch == '_'))
+            return false;
+        tm.skip(ch -> ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9' || ch == '_');
+        tm.setStart(identifierStart);
+        return true;
     }
 
 }

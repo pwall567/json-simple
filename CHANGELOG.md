@@ -2,6 +2,13 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.6] - 2022-11-06
+### Added
+- `ParseOptions`: non-standard parsing options
+### Changed
+- `Parser`: modified to use `ParseOptions`
+- `pom.xml`: bumped dependency version
+
 ## [1.5.5] - 2022-06-01
 ### Changed
 - `pom.xml`: bumped dependency version

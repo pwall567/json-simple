@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.pwall.json.parser.ParseException;
+import net.pwall.json.parser.ParseOptions;
 import net.pwall.json.parser.Parser;
 
 public class ParserObjectTest {
@@ -103,12 +104,78 @@ public class ParserObjectTest {
     }
 
     @Test
+    public void shouldAllowMissingQuotesWithOption_objectKeyUnquoted() {
+        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, true, false, false);
+        Object result = Parser.parse("{first:123}", options);
+        assertTrue(result instanceof Map);
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(1, map.size());
+        assertTrue(map.get("first") instanceof Integer);
+        assertEquals(123, map.get("first"));
+    }
+
+    @Test
     public void shouldThrowExceptionOnDuplicateKeys() {
-        ParseException e = assertThrows(ParseException.class,
-                () -> Parser.parse("{\"first\":123,\"first\":456}"));
-        assertEquals("Duplicate key in JSON object", e.getText());
+        ParseException e = assertThrows(ParseException.class, () -> Parser.parse("{\"first\":123,\"first\":456}"));
+        assertEquals("Duplicate key in JSON object \"first\"", e.getText());
         assertEquals("", e.getPointer());
-        assertEquals("Duplicate key in JSON object", e.getMessage());
+        assertEquals("Duplicate key in JSON object \"first\"", e.getMessage());
+    }
+
+    @Test
+    public void shouldThrowExceptionOnDuplicateKeysWithOptionERROR() {
+        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, false, false);
+        ParseException e = assertThrows(ParseException.class,
+                () -> Parser.parse("{\"first\":123,\"first\":456}", options));
+        assertEquals("Duplicate key in JSON object \"first\"", e.getText());
+        assertEquals("", e.getPointer());
+        assertEquals("Duplicate key in JSON object \"first\"", e.getMessage());
+    }
+
+    @Test
+    public void shouldThrowExceptionOnDuplicateKeysWithOptionCHECK_IDENTICALAndDifferentValues() {
+        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.CHECK_IDENTICAL, false, false, false);
+        ParseException e = assertThrows(ParseException.class,
+                () -> Parser.parse("{\"first\":123,\"first\":456}", options));
+        assertEquals("Duplicate key in JSON object \"first\"", e.getText());
+        assertEquals("", e.getPointer());
+        assertEquals("Duplicate key in JSON object \"first\"", e.getMessage());
+    }
+
+    @Test
+    public void shouldTakeFirstOnDuplicateKeysWithOptionCHECK_IDENTICALAndSameValues() {
+        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.TAKE_FIRST, false, false, false);
+        Object result = Parser.parse("{\"first\":123,\"first\":123}", options);
+        assertTrue(result instanceof Map);
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(1, map.size());
+        Object value = map.get("first");
+        assertTrue(value instanceof Integer);
+        assertEquals(123, value);
+    }
+
+    @Test
+    public void shouldTakeFirstOnDuplicateKeysWithOptionTAKE_FIRST() {
+        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.TAKE_FIRST, false, false, false);
+        Object result = Parser.parse("{\"first\":123,\"first\":456}", options);
+        assertTrue(result instanceof Map);
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(1, map.size());
+        Object value = map.get("first");
+        assertTrue(value instanceof Integer);
+        assertEquals(123, value);
+    }
+
+    @Test
+    public void shouldTakeLastOnDuplicateKeysWithOptionTAKE_LAST() {
+        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.TAKE_LAST, false, false, false);
+        Object result = Parser.parse("{\"first\":123,\"first\":456}", options);
+        assertTrue(result instanceof Map);
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(1, map.size());
+        Object value = map.get("first");
+        assertTrue(value instanceof Integer);
+        assertEquals(456, value);
     }
 
 }
