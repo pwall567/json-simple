@@ -266,12 +266,9 @@ public class Parser {
     }
 
     private static boolean matchIdentifier(TextMatcher tm) {
-        int identifierStart = tm.getIndex();
-        if (!tm.match(ch -> ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch == '_'))
-            return false;
-        tm.skip(ch -> ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9' || ch == '_');
-        tm.setStart(identifierStart);
-        return true;
+        return tm.match(ch -> ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch == '_') &&
+                tm.matchContinue(ch -> ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9' ||
+                        ch == '_');
     }
 
 }
