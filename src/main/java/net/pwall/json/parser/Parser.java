@@ -208,20 +208,20 @@ public class Parser {
 
         int numberStart = tm.getIndex();
         boolean negative = tm.match('-');
-        if (tm.matchDec(0, 1)) {
+        if (tm.matchDec()) {
             int integerLength = tm.getResultLength();
             if (integerLength > 1 && tm.getResultChar() == '0')
                 throw new ParseException(ILLEGAL_NUMBER, pointer);
             boolean floating = false;
             if (tm.match('.')) {
                 floating = true;
-                if (!tm.matchDec(0, 1))
+                if (!tm.matchDec())
                     throw new ParseException(ILLEGAL_NUMBER, pointer);
             }
-            if (tm.match('e') || tm.match('E')) {
+            if (tm.match(ch -> ch == 'e' || ch == 'E')) {
                 floating = true;
-                tm.matchAny("-+"); // ignore the result, just step the index
-                if (!tm.matchDec(0, 1))
+                tm.match(ch -> ch == '-' || ch == '+'); // ignore the result, just step the index
+                if (!tm.matchDec())
                     throw new ParseException(ILLEGAL_NUMBER, pointer);
             }
             if (!floating) {
