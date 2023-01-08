@@ -2,7 +2,7 @@
  * @(#) Parser.java
  *
  * json-simple  Simple JSON Parser and Formatter
- * Copyright (c) 2021, 2022 Peter Wall
+ * Copyright (c) 2021, 2022, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -166,6 +166,10 @@ public class Parser {
                     if (!tm.match(','))
                         break;
                     tm.skip(JSONFunctions::isSpaceCharacter);
+                    if (options.getObjectTrailingComma() && tm.match('}')) {
+                        tm.revert();
+                        break;
+                    }
                 }
                 if (!tm.match('}'))
                     throw new ParseException(MISSING_CLOSING_BRACE, pointer);
@@ -178,7 +182,7 @@ public class Parser {
             int index = 0;
             tm.skip(JSONFunctions::isSpaceCharacter);
             if (!tm.match(']')) {
-                do {
+                while (true) {
                     if (index == array.length) {
                         Object[] newArray = new Object[array.length + Math.min(array.length, 4096)];
                         System.arraycopy(array, 0, newArray, 0, array.length);
@@ -187,7 +191,14 @@ public class Parser {
                     array[index] = parse(tm, options, pointer + '/' + index);
                     index++;
                     tm.skip(JSONFunctions::isSpaceCharacter);
-                } while (tm.match(','));
+                    if (!tm.match(','))
+                        break;
+                    tm.skip(JSONFunctions::isSpaceCharacter);
+                    if (options.getArrayTrailingComma() && tm.match(']')) {
+                        tm.revert();
+                        break;
+                    }
+                }
                 if (!tm.match(']'))
                     throw new ParseException(MISSING_CLOSING_BRACKET, pointer);
             }

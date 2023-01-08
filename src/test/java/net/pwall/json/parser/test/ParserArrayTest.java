@@ -2,7 +2,7 @@
  * @(#) ParserArrayTest.java
  *
  * json-simple  Simple JSON Parser and Formatter
- * Copyright (c) 2021 Peter Wall
+ * Copyright (c) 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.pwall.json.parser.ParseException;
+import net.pwall.json.parser.ParseOptions;
 import net.pwall.json.parser.Parser;
 
 public class ParserArrayTest {
@@ -79,6 +80,24 @@ public class ParserArrayTest {
         assertEquals(2, list3.size());
         assertEquals("world", list3.get(0));
         assertEquals("universe", list3.get(1));
+    }
+
+    @Test
+    public void shouldThrowExceptionOnTrailingComma() {
+        ParseException e = assertThrows(ParseException.class, () -> Parser.parse("[\"simple\",]"));
+        assertEquals("Illegal JSON syntax", e.getText());
+        assertEquals("/1", e.getPointer());
+        assertEquals("Illegal JSON syntax at /1", e.getMessage());
+    }
+
+    @Test
+    public void shouldAllowTrailingCommaWithOption_arrayTrailingComma() {
+        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, false, true);
+        Object result = Parser.parse("[\"simple\",]", options);
+        assertTrue(result instanceof List);
+        List<?> list = (List<?>)result;
+        assertEquals(1, list.size());
+        assertEquals("simple", list.get(0));
     }
 
     @Test

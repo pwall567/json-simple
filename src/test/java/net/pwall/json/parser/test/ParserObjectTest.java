@@ -2,7 +2,7 @@
  * @(#) ParserObjectTest.java
  *
  * json-simple  Simple JSON Parser and Formatter
- * Copyright (c) 2021 Peter Wall
+ * Copyright (c) 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -93,6 +93,23 @@ public class ParserObjectTest {
         assertEquals("Missing colon in JSON object", e.getText());
         assertEquals("", e.getPointer());
         assertEquals("Missing colon in JSON object", e.getMessage());
+    }
+
+    @Test
+    public void shouldThrowExceptionOnTrailingComma() {
+        ParseException e = assertThrows(ParseException.class, () -> Parser.parse("{\"first\":123,}"));
+        assertEquals("Illegal key in JSON object", e.getText());
+        assertEquals("", e.getPointer());
+        assertEquals("Illegal key in JSON object", e.getMessage());
+    }
+
+    @Test
+    public void shouldAllowTrailingCommaWithOption_objectTrailingComma() {
+        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, true, false);
+        Object result = Parser.parse("{\"first\":123,}", options);
+        assertTrue(result instanceof Map);
+        Map<?, ?> map = (Map<?, ?>)result;
+        assertEquals(123, map.get("first"));
     }
 
     @Test
