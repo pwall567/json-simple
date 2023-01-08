@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.7.2] - 2022-11-23
+### Changed
+- `Parser`: Completed use of `ParseOptions`
+- `pom.xml`: bumped dependency version
+
 ## [1.7.1] - 2022-11-21
 ### Changed
 - `pom.xml`: bumped dependency versions
