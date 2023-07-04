@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import net.pwall.json.parser.ParseException;
 import net.pwall.json.parser.ParseOptions;
 import net.pwall.json.parser.Parser;
+import static net.pwall.json.parser.Parser.MAX_DEPTH_EXCEEDED;
 
 public class ParserArrayTest {
 
@@ -92,7 +93,7 @@ public class ParserArrayTest {
 
     @Test
     public void shouldAllowTrailingCommaWithOption_arrayTrailingComma() {
-        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, false, true);
+        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, false, true, 1000);
         Object result = Parser.parse("[\"simple\",]", options);
         assertTrue(result instanceof List);
         List<?> list = (List<?>)result;
@@ -106,6 +107,35 @@ public class ParserArrayTest {
         assertEquals("Missing closing bracket in JSON array", e.getText());
         assertEquals("", e.getPointer());
         assertEquals("Missing closing bracket in JSON array", e.getMessage());
+    }
+
+    @Test
+    public void shouldAllowNestingUpToMaximumDepth() {
+        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, false, false, 50);
+        StringBuilder allowed = new StringBuilder(101);
+        for (int i = 50; i > 0; i--)
+            allowed.append('[');
+        allowed.append('1');
+        for (int i = 50; i > 0; i--)
+            allowed.append(']');
+        Object result = Parser.parse(allowed.toString(), options);
+        for (int i = 50; i > 0; i--) {
+            assertTrue(result instanceof List<?>);
+            result = ((List<?>)result).get(0);
+        }
+        assertEquals(1, result);
+    }
+
+    @Test
+    public void shouldThrowExceptionOnNestingDepthExceeded() {
+        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, false, false, 50);
+        StringBuilder excessive = new StringBuilder(51);
+        for (int i = 51; i > 0; i--)
+            excessive.append('[');
+        ParseException pe = assertThrows(ParseException.class, () -> Parser.parse(excessive.toString(), options));
+        assertEquals(MAX_DEPTH_EXCEEDED, pe.getText());
+        assertEquals(MAX_DEPTH_EXCEEDED, pe.getMessage());
+        assertEquals("", pe.getPointer());
     }
 
 }

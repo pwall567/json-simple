@@ -25,39 +25,50 @@
 
 package net.pwall.json.parser;
 
+import static net.pwall.json.parser.Parser.MAX_DEPTH_ERROR;
+
 public class ParseOptions {
 
     private final DuplicateKeyOption objectKeyDuplicate;
-    private final Boolean objectKeyUnquoted;
-    private final Boolean objectTrailingComma;
-    private final Boolean arrayTrailingComma;
+    private final boolean objectKeyUnquoted;
+    private final boolean objectTrailingComma;
+    private final boolean arrayTrailingComma;
+    private final int maximumNestingDepth;
 
     public ParseOptions(
             DuplicateKeyOption objectKeyDuplicate,
-            Boolean objectKeyUnquoted,
-            Boolean objectTrailingComma,
-            Boolean arrayTrailingComma
+            boolean objectKeyUnquoted,
+            boolean objectTrailingComma,
+            boolean arrayTrailingComma,
+            int maximumNestingDepth
     ) {
+        if (maximumNestingDepth < 1 || maximumNestingDepth > 1200)
+            throw new IllegalArgumentException(MAX_DEPTH_ERROR + ", was " + maximumNestingDepth);
         this.objectKeyDuplicate = objectKeyDuplicate;
         this.objectKeyUnquoted = objectKeyUnquoted;
         this.objectTrailingComma = objectTrailingComma;
         this.arrayTrailingComma = arrayTrailingComma;
+        this.maximumNestingDepth = maximumNestingDepth;
     }
 
     public DuplicateKeyOption getObjectKeyDuplicate() {
         return objectKeyDuplicate;
     }
 
-    public Boolean getObjectKeyUnquoted() {
+    public boolean getObjectKeyUnquoted() {
         return objectKeyUnquoted;
     }
 
-    public Boolean getObjectTrailingComma() {
+    public boolean getObjectTrailingComma() {
         return objectTrailingComma;
     }
 
-    public Boolean getArrayTrailingComma() {
+    public boolean getArrayTrailingComma() {
         return arrayTrailingComma;
+    }
+
+    public int getMaximumNestingDepth() {
+        return maximumNestingDepth;
     }
 
     public enum DuplicateKeyOption { ERROR, TAKE_FIRST, TAKE_LAST, CHECK_IDENTICAL }

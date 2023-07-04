@@ -29,12 +29,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+
+import static net.pwall.json.parser.Parser.MAX_DEPTH_EXCEEDED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.pwall.json.parser.ParseException;
 import net.pwall.json.parser.ParseOptions;
+import net.pwall.json.parser.ParseOptions.DuplicateKeyOption;
 import net.pwall.json.parser.Parser;
 
 public class ParserObjectTest {
@@ -105,7 +108,7 @@ public class ParserObjectTest {
 
     @Test
     public void shouldAllowTrailingCommaWithOption_objectTrailingComma() {
-        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, true, false);
+        ParseOptions options = new ParseOptions(DuplicateKeyOption.ERROR, false, true, false, 1000);
         Object result = Parser.parse("{\"first\":123,}", options);
         assertTrue(result instanceof Map);
         Map<?, ?> map = (Map<?, ?>)result;
@@ -122,7 +125,7 @@ public class ParserObjectTest {
 
     @Test
     public void shouldAllowMissingQuotesWithOption_objectKeyUnquoted() {
-        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, true, false, false);
+        ParseOptions options = new ParseOptions(DuplicateKeyOption.ERROR, true, false, false, 1000);
         Object result = Parser.parse("{first:123}", options);
         assertTrue(result instanceof Map);
         Map<?, ?> map = (Map<?, ?>)result;
@@ -141,7 +144,7 @@ public class ParserObjectTest {
 
     @Test
     public void shouldThrowExceptionOnDuplicateKeysWithOptionERROR() {
-        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, false, false);
+        ParseOptions options = new ParseOptions(DuplicateKeyOption.ERROR, false, false, false, 1000);
         ParseException e = assertThrows(ParseException.class,
                 () -> Parser.parse("{\"first\":123,\"first\":456}", options));
         assertEquals("Duplicate key in JSON object \"first\"", e.getText());
@@ -151,7 +154,7 @@ public class ParserObjectTest {
 
     @Test
     public void shouldThrowExceptionOnDuplicateKeysWithOptionCHECK_IDENTICALAndDifferentValues() {
-        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.CHECK_IDENTICAL, false, false, false);
+        ParseOptions options = new ParseOptions(DuplicateKeyOption.CHECK_IDENTICAL, false, false, false, 1000);
         ParseException e = assertThrows(ParseException.class,
                 () -> Parser.parse("{\"first\":123,\"first\":456}", options));
         assertEquals("Duplicate key in JSON object \"first\"", e.getText());
@@ -161,7 +164,7 @@ public class ParserObjectTest {
 
     @Test
     public void shouldTakeFirstOnDuplicateKeysWithOptionCHECK_IDENTICALAndSameValues() {
-        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.TAKE_FIRST, false, false, false);
+        ParseOptions options = new ParseOptions(DuplicateKeyOption.TAKE_FIRST, false, false, false, 1000);
         Object result = Parser.parse("{\"first\":123,\"first\":123}", options);
         assertTrue(result instanceof Map);
         Map<?, ?> map = (Map<?, ?>)result;
@@ -173,7 +176,7 @@ public class ParserObjectTest {
 
     @Test
     public void shouldTakeFirstOnDuplicateKeysWithOptionTAKE_FIRST() {
-        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.TAKE_FIRST, false, false, false);
+        ParseOptions options = new ParseOptions(DuplicateKeyOption.TAKE_FIRST, false, false, false, 1000);
         Object result = Parser.parse("{\"first\":123,\"first\":456}", options);
         assertTrue(result instanceof Map);
         Map<?, ?> map = (Map<?, ?>)result;
@@ -185,7 +188,7 @@ public class ParserObjectTest {
 
     @Test
     public void shouldTakeLastOnDuplicateKeysWithOptionTAKE_LAST() {
-        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.TAKE_LAST, false, false, false);
+        ParseOptions options = new ParseOptions(DuplicateKeyOption.TAKE_LAST, false, false, false, 1000);
         Object result = Parser.parse("{\"first\":123,\"first\":456}", options);
         assertTrue(result instanceof Map);
         Map<?, ?> map = (Map<?, ?>)result;
@@ -193,6 +196,35 @@ public class ParserObjectTest {
         Object value = map.get("first");
         assertTrue(value instanceof Integer);
         assertEquals(456, value);
+    }
+
+    @Test
+    public void shouldAllowNestingUpToMaximumDepth() {
+        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, false, false, 50);
+        StringBuilder allowed = new StringBuilder(301);
+        for (int i = 50; i > 0; i--)
+            allowed.append("{\"a\":");
+        allowed.append('1');
+        for (int i = 50; i > 0; i--)
+            allowed.append('}');
+        Object result = Parser.parse(allowed.toString(), options);
+        for (int i = 50; i > 0; i--) {
+            assertTrue(result instanceof Map<?, ?>);
+            result = ((Map<?, ?>)result).get("a");
+        }
+        assertEquals(1, result);
+    }
+
+    @Test
+    public void shouldThrowExceptionOnNestingDepthExceeded() {
+        ParseOptions options = new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, false, false, 50);
+        StringBuilder excessive = new StringBuilder(51);
+        for (int i = 51; i > 0; i--)
+            excessive.append("{\"a\":");
+        ParseException e = assertThrows(ParseException.class, () -> Parser.parse(excessive.toString(), options));
+        assertEquals(MAX_DEPTH_EXCEEDED, e.getText());
+        assertEquals(MAX_DEPTH_EXCEEDED, e.getMessage());
+        assertEquals("", e.getPointer());
     }
 
 }

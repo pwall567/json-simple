@@ -76,9 +76,11 @@ public class Parser {
     public static final String MISSING_COLON = "Missing colon in JSON object";
     public static final String MISSING_CLOSING_BRACE = "Missing closing brace in JSON object";
     public static final String MISSING_CLOSING_BRACKET = "Missing closing bracket in JSON array";
+    public static final String MAX_DEPTH_EXCEEDED = "Maximum nesting depth exceeded";
+    public static final String MAX_DEPTH_ERROR = "Maximum nesting depth must be 1..1200";
 
     private static final ParseOptions defaultOptions =
-            new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, false, false);
+            new ParseOptions(ParseOptions.DuplicateKeyOption.ERROR, false, false, false, 1000);
 
     /**
      * Parse a string of JSON and return a value as described in the class documentation.
@@ -102,7 +104,7 @@ public class Parser {
      */
     public static Object parse(String json, ParseOptions options) {
         TextMatcher tm = new TextMatcher(json);
-        Object result = parse(tm, options, ROOT_POINTER);
+        Object result = parse(tm, options, ROOT_POINTER, 0);
         tm.skip(JSONFunctions::isSpaceCharacter);
         if (!tm.isAtEnd())
             throw new ParseException(EXCESS_CHARS);
@@ -116,10 +118,14 @@ public class Parser {
      * @param   tm              a {@link TextMatcher}
      * @param   pointer         a string in <a href="https://tools.ietf.org/html/rfc6901">JSON Pointer</a> syntax
      *                          describing the position in the result JSON (for use in error reporting)
+     * @param   depth           the current nesting depth
      * @return                  the JSON element
      * @throws  ParseException  if there are any errors in the JSON
      */
-    private static Object parse(TextMatcher tm, ParseOptions options, String pointer) {
+    private static Object parse(TextMatcher tm, ParseOptions options, String pointer, int depth) {
+        if (depth > options.getMaximumNestingDepth())
+            throw new ParseException(MAX_DEPTH_EXCEEDED);
+
         tm.skip(JSONFunctions::isSpaceCharacter);
 
         if (tm.match('{')) {
@@ -144,7 +150,7 @@ public class Parser {
                         System.arraycopy(array, 0, newArray, 0, array.length);
                         array = newArray;
                     }
-                    Object value = parse(tm, options, pointer + '/' + key);
+                    Object value = parse(tm, options, pointer + '/' + key, depth + 1);
                     int i = ImmutableMap.findKey(array, index, key);
                     if (i >= 0) {
                         switch (options.getObjectKeyDuplicate()) {
@@ -188,7 +194,7 @@ public class Parser {
                         System.arraycopy(array, 0, newArray, 0, array.length);
                         array = newArray;
                     }
-                    array[index] = parse(tm, options, pointer + '/' + index);
+                    array[index] = parse(tm, options, pointer + '/' + index, depth + 1);
                     index++;
                     tm.skip(JSONFunctions::isSpaceCharacter);
                     if (!tm.match(','))
@@ -280,6 +286,24 @@ public class Parser {
         return tm.match(ch -> ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch == '_') &&
                 tm.matchContinue(ch -> ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9' ||
                         ch == '_');
+    }
+
+    private static String findStartOfRecursion(String pointer) {
+        String result = pointer;
+        int i = result.lastIndexOf('/');
+        if (i > 0) {
+            String previous = result.substring(i);
+            result = result.substring(0, i);
+            while (result.length() > 0) {
+                i = result.lastIndexOf('/');
+                if (i < 0)
+                    break;
+                String node = result.substring(i);
+                if (!result.substring(i).equals(previous))
+                    break;
+            }
+        }
+        return result;
     }
 
 }
