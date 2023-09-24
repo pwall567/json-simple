@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [Unreleased]
+### Changed
+- `Formatter`: minor performance tweaks
+- `pom.xml`: bumped dependency version
+
 ## [1.7.4] - 2023-07-04
 ### Changed
 - `Parser`, `ParseOptions`: added check for excessive nesting
