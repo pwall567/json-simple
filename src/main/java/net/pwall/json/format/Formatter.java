@@ -2,7 +2,7 @@
  * @(#) Formatter.java
  *
  * json-simple  Simple JSON Parser and Formatter
- * Copyright (c) 2021 Peter Wall
+ * Copyright (c) 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -208,22 +208,21 @@ public class Formatter {
         else if (value instanceof Map) {
             Map<?, ?> map = (Map<?, ?>)value;
             a.append('{');
-            if (map.size() > 0) {
+            if (!map.isEmpty()) {
                 // potential optimisation - if size == 1 and contents size <= 1, output on one line
-                appendLineSeparator(a);
                 Iterator<? extends Map.Entry<?, ?>> iterator = map.entrySet().iterator();
+                int indented = currentIndent + indent;
                 while (true) {
+                    appendLineSeparator(a);
                     Map.Entry<?, ?> entry = iterator.next();
-                    int newIndent = currentIndent + indent;
-                    appendSpaces(a, newIndent);
+                    appendSpaces(a, indented);
                     JSONFunctions.appendString(a, entry.getKey().toString(), false);
                     a.append(':');
                     a.append(' ');
-                    formatTo(a, entry.getValue(), newIndent);
+                    formatTo(a, entry.getValue(), indented);
                     if (!iterator.hasNext())
                         break;
                     a.append(',');
-                    appendLineSeparator(a);
                 }
                 appendLineSeparator(a);
                 appendSpaces(a, currentIndent);
@@ -233,17 +232,17 @@ public class Formatter {
         else if (value instanceof Collection) {
             Collection<?> collection = (Collection<?>)value;
             a.append('[');
-            if (collection.size() > 0) {
+            if (!collection.isEmpty()) {
                 // potential optimisation - if size == 1 and contents size <= 1, output on one line
-                appendLineSeparator(a);
                 Iterator<?> iterator = collection.iterator();
+                int indented = currentIndent + indent;
                 while (true) {
-                    appendSpaces(a, currentIndent + indent);
-                    formatTo(a, iterator.next(), currentIndent + indent);
+                    appendLineSeparator(a);
+                    appendSpaces(a, indented);
+                    formatTo(a, iterator.next(), indented);
                     if (!iterator.hasNext())
                         break;
                     a.append(',');
-                    appendLineSeparator(a);
                 }
                 appendLineSeparator(a);
                 appendSpaces(a, currentIndent);
@@ -256,15 +255,15 @@ public class Formatter {
             int n = array.length;
             if (n > 0) {
                 // potential optimisation - if size == 1 and contents size <= 1, output on one line
-                appendLineSeparator(a);
                 int i = 0;
+                int indented = currentIndent + indent;
                 while (true) {
-                    appendSpaces(a, currentIndent + indent);
-                    formatTo(a, array[i++], currentIndent + indent);
+                    appendLineSeparator(a);
+                    appendSpaces(a, indented);
+                    formatTo(a, array[i++], indented);
                     if (i >= n)
                         break;
                     a.append(',');
-                    appendLineSeparator(a);
                 }
                 appendLineSeparator(a);
                 appendSpaces(a, currentIndent);
@@ -295,8 +294,7 @@ public class Formatter {
     }
 
     /**
-     * Output the given {@link Object} as JSON by appending to an {@link Appendable}.  JSON objects are output with each
-     * property on a separate line, and JSON arrays are output with each item on a line.
+     * Output the given {@link Object} as JSON by appending to an {@link Appendable}.
      *
      * @param   a           the {@link Appendable}
      * @param   value       the {@link Object} (may be {@code null})
@@ -309,7 +307,7 @@ public class Formatter {
         else if (value instanceof Map) {
             Map<?, ?> map = (Map<?, ?>)value;
             a.append('{');
-            if (map.size() > 0) {
+            if (!map.isEmpty()) {
                 Iterator<? extends Map.Entry<?, ?>> iterator = map.entrySet().iterator();
                 while (true) {
                     Map.Entry<?, ?> entry = iterator.next();
@@ -326,7 +324,7 @@ public class Formatter {
         else if (value instanceof Collection) {
             Collection<?> collection = (Collection<?>)value;
             a.append('[');
-            if (collection.size() > 0) {
+            if (!collection.isEmpty()) {
                 Iterator<?> iterator = collection.iterator();
                 while (true) {
                     outputTo(a, iterator.next());
