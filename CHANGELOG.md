@@ -2,7 +2,7 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
-## [Unreleased]
+## [1.7.5] - 2023-09-24
 ### Changed
 - `Formatter`: minor performance tweaks
 - `pom.xml`: bumped dependency version
