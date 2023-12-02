@@ -2,7 +2,7 @@
  * @(#) FormatterTest.java
  *
  * json-simple  Simple JSON Parser and Formatter
- * Copyright (c) 2021 Peter Wall
+ * Copyright (c) 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 import net.pwall.json.JSONSimple;
 import net.pwall.json.format.Formatter;

@@ -2,7 +2,7 @@
  * @(#) ParserNumberTest.java
  *
  * json-simple  Simple JSON Parser and Formatter
- * Copyright (c) 2021 Peter Wall
+ * Copyright (c) 2021, 2023 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,10 +27,10 @@ package net.pwall.json.parser.test;
 
 import java.math.BigDecimal;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import net.pwall.json.parser.ParseException;
 import net.pwall.json.parser.Parser;
@@ -41,7 +41,7 @@ public class ParserNumberTest {
     public void shouldParseZero() {
         Object result = Parser.parse("0");
         assertTrue(result instanceof Integer);
-        assertEquals(0, (Integer)result);
+        assertEquals(0, ((Integer)result).intValue());
     }
 
     @Test
@@ -66,58 +66,58 @@ public class ParserNumberTest {
     public void shouldParsePositiveIntegers() {
         Object result = Parser.parse("123");
         assertTrue(result instanceof Integer);
-        assertEquals(123, (Integer)result);
+        assertEquals(123, ((Integer)result).intValue());
         result = Parser.parse("5678900");
         assertTrue(result instanceof Integer);
-        assertEquals(5678900, (Integer)result);
+        assertEquals(5678900, ((Integer)result).intValue());
         result = Parser.parse("2147483647");
         assertTrue(result instanceof Integer);
-        assertEquals(2147483647, (Integer)result);
+        assertEquals(2147483647, ((Integer)result).intValue());
     }
 
     @Test
     public void shouldParseNegativeIntegers() {
         Object result = Parser.parse("-1");
         assertTrue(result instanceof Integer);
-        assertEquals(-1, (Integer)result);
+        assertEquals(-1, ((Integer)result).intValue());
         result = Parser.parse("-876543");
         assertTrue(result instanceof Integer);
-        assertEquals(-876543, (Integer)result);
+        assertEquals(-876543, ((Integer)result).intValue());
         result = Parser.parse("-2147483648");
         assertTrue(result instanceof Integer);
-        assertEquals(-2147483648, (Integer)result);
+        assertEquals(-2147483648, ((Integer)result).intValue());
     }
 
     @Test
     public void shouldParsePositiveLongIntegers() {
         Object result = Parser.parse("1234567890000");
         assertTrue(result instanceof Long);
-        assertEquals(1234567890000L, (Long)result);
+        assertEquals(1234567890000L, ((Long)result).longValue());
         result = Parser.parse("567895678956789");
         assertTrue(result instanceof Long);
-        assertEquals(567895678956789L, (Long)result);
+        assertEquals(567895678956789L, ((Long)result).longValue());
         result = Parser.parse("2147483648");
         assertTrue(result instanceof Long);
-        assertEquals(2147483648L, (Long)result);
+        assertEquals(2147483648L, ((Long)result).longValue());
         result = Parser.parse("9223372036854775807");
         assertTrue(result instanceof Long);
-        assertEquals(9223372036854775807L, (Long)result);
+        assertEquals(9223372036854775807L, ((Long)result).longValue());
     }
 
     @Test
     public void shouldParseNegativeLongIntegers() {
         Object result = Parser.parse("-1234567890000");
         assertTrue(result instanceof Long);
-        assertEquals(-1234567890000L, (Long)result);
+        assertEquals(-1234567890000L, ((Long)result).longValue());
         result = Parser.parse("-567895678956789");
         assertTrue(result instanceof Long);
-        assertEquals(-567895678956789L, (Long)result);
+        assertEquals(-567895678956789L, ((Long)result).longValue());
         result = Parser.parse("-2147483649");
         assertTrue(result instanceof Long);
-        assertEquals(-2147483649L, (Long)result);
+        assertEquals(-2147483649L, ((Long)result).longValue());
         result = Parser.parse("-9223372036854775808");
         assertTrue(result instanceof Long);
-        assertEquals(-9223372036854775808L, (Long)result);
+        assertEquals(-9223372036854775808L, ((Long)result).longValue());
     }
 
     @Test

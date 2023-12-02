@@ -28,17 +28,16 @@ package net.pwall.json.parser.test;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.Test;
-
-import static net.pwall.json.parser.Parser.MAX_DEPTH_EXCEEDED;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import net.pwall.json.parser.ParseException;
 import net.pwall.json.parser.ParseOptions;
 import net.pwall.json.parser.ParseOptions.DuplicateKeyOption;
 import net.pwall.json.parser.Parser;
+import static net.pwall.json.parser.Parser.MAX_DEPTH_EXCEEDED;
 
 public class ParserObjectTest {
 
