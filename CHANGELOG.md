@@ -2,6 +2,11 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.8] - 2023-12-02
+### Changed
+- tests: switched to JUnit 4 (JUnit 5 was causing build problems)
+- `pom.xml`: bumped dependency versions
+
 ## [1.7.5] - 2023-09-24
 ### Changed
 - `Formatter`: minor performance tweaks
