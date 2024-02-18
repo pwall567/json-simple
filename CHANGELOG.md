@@ -2,6 +2,10 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.9] - 2024-02-18
+### Changed
+- `pom.xml`: bumped dependency version
+
 ## [1.8] - 2023-12-02
 ### Changed
 - tests: switched to JUnit 4 (JUnit 5 was causing build problems)
