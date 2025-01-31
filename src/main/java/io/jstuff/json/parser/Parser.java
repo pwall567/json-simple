@@ -23,22 +23,22 @@
  * SOFTWARE.
  */
 
-package net.pwall.json.parser;
+package io.jstuff.json.parser;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import net.pwall.json.JSONFunctions;
-import net.pwall.text.TextMatcher;
-import net.pwall.util.ImmutableList;
-import net.pwall.util.ImmutableMap;
-import net.pwall.util.ImmutableMapEntry;
+import io.jstuff.json.JSONFunctions;
+import io.jstuff.text.TextMatcher;
+import io.jstuff.util.ImmutableList;
+import io.jstuff.util.ImmutableMap;
+import io.jstuff.util.ImmutableMapEntry;
 
 /**
  * A simple JSON parser.  This class consists of static functions that parse JSON into standard Java classes, avoiding
  * the need for additional class definitions.
- *
+ * <br>
  * The {@code parse} functions return a value of type <b><i>J</i></b> (not an actual parameterised type), where
  * <b><i>J</i></b> is one of the following:
  *
@@ -286,24 +286,6 @@ public class Parser {
         return tm.match(ch -> ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch == '_') &&
                 tm.matchContinue(ch -> ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9' ||
                         ch == '_');
-    }
-
-    private static String findStartOfRecursion(String pointer) {
-        String result = pointer;
-        int i = result.lastIndexOf('/');
-        if (i > 0) {
-            String previous = result.substring(i);
-            result = result.substring(0, i);
-            while (result.length() > 0) {
-                i = result.lastIndexOf('/');
-                if (i < 0)
-                    break;
-                String node = result.substring(i);
-                if (!result.substring(i).equals(previous))
-                    break;
-            }
-        }
-        return result;
     }
 
 }

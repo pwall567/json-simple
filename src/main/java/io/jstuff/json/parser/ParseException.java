@@ -23,9 +23,9 @@
  * SOFTWARE.
  */
 
-package net.pwall.json.parser;
+package io.jstuff.json.parser;
 
-import net.pwall.json.JSONSimpleException;
+import io.jstuff.json.JSONSimpleException;
 
 /**
  * Exception class for parse exceptions.  Includes a string in
@@ -46,7 +46,7 @@ public class ParseException extends JSONSimpleException {
      * @param   pointer     the JSON Pointer (in string form)
      */
     public ParseException(String text, String pointer) {
-        super(pointer.length() == 0 ? text : text + " at " + pointer);
+        super(pointer.isEmpty() ? text : text + " at " + pointer);
         this.text = text;
         this.pointer = pointer;
     }

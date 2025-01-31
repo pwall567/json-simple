@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package net.pwall.json.format.test;
+package io.jstuff.json.format.test;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,9 +33,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-import net.pwall.json.JSONSimple;
-import net.pwall.json.format.Formatter;
-import static net.pwall.json.format.Formatter.unixLineSeparator;
+import io.jstuff.json.JSONSimple;
+import io.jstuff.json.format.Formatter;
+import static io.jstuff.json.format.Formatter.unixLineSeparator;
 
 public class FormatterTest {
 

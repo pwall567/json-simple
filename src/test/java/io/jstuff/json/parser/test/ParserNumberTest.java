@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package net.pwall.json.parser.test;
+package io.jstuff.json.parser.test;
 
 import java.math.BigDecimal;
 
@@ -32,8 +32,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import net.pwall.json.parser.ParseException;
-import net.pwall.json.parser.Parser;
+import io.jstuff.json.parser.ParseException;
+import io.jstuff.json.parser.Parser;
 
 public class ParserNumberTest {
 

@@ -23,9 +23,9 @@
  * SOFTWARE.
  */
 
-package net.pwall.json.parser;
+package io.jstuff.json.parser;
 
-import static net.pwall.json.parser.Parser.MAX_DEPTH_ERROR;
+import static io.jstuff.json.parser.Parser.MAX_DEPTH_ERROR;
 
 public class ParseOptions {
 

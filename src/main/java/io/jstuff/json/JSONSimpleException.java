@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package net.pwall.json;
+package io.jstuff.json;
 
 /**
  * An exception class for use by the {@code json-simple} project.

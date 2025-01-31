@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package net.pwall.json.test;
+package io.jstuff.json.test;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import net.pwall.json.JSONSimple;
+import io.jstuff.json.JSONSimple;
 
 public class JSONSimpleTest {
 

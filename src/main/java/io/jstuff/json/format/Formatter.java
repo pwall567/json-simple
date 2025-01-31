@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package net.pwall.json.format;
+package io.jstuff.json.format;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -31,8 +31,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import net.pwall.json.JSONFunctions;
-import net.pwall.util.IntOutput;
+import io.jstuff.json.JSONFunctions;
+import io.jstuff.util.IntOutput;
 
 /**
  * JSON Formatter - formats a data structure as JSON using the specified indentation and line termination settings.
@@ -56,7 +56,7 @@ import net.pwall.util.IntOutput;
  *   string is used as a JSON boolean value; otherwise the string is output as a JSON string (this will catch the
  *   {@link Boolean} class, as well as other classes representing boolean values).</dd>
  * </dl>
- * This is a superset of the output of the {@link net.pwall.json.parser.Parser Parser} class, so this class may be
+ * This is a superset of the output of the {@link io.jstuff.json.parser.Parser Parser} class, so this class may be
  * used as a complement to that one - to output structures created by that class or to create JSON data to be read
  * by it.  It also works well with the {@code JSONValue} structures produced by the {@code JSON.parse()} functions of
  * the <a href="https://github.com/pwall567/jsonutil">jsonutil</a> and
@@ -68,7 +68,7 @@ import net.pwall.util.IntOutput;
 public class Formatter {
 
     public static final int defaultIndent = 2;
-    public static final String systemLineSeparator = System.getProperty("line.separator");
+    public static final String systemLineSeparator = System.lineSeparator();
     public static final String unixLineSeparator = "\n";
 
     private static final Formatter defaultFormatter = new Formatter();
@@ -359,7 +359,7 @@ public class Formatter {
      * Append a primitive value (string, number, boolean) to an {@link Appendable} in the form required by JSON.
      *
      * <p>This is invoked for every object that is not an array or a {@link Collection} or {@link Map}.  In the case of
-     * structures created by {@link net.pwall.json.parser.Parser Parser}</p>
+     * structures created by {@link io.jstuff.json.parser.Parser Parser}</p>
      *
      * @param   a           the {@link Appendable}
      * @param   value       the primitive value

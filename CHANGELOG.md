@@ -2,6 +2,14 @@
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [2.0] - 2025-01-30
+### Added
+- `build.yml`, `deploy.yml`: converted project to GitHub Actions
+### Changed
+- `pom.xml`: moved to `io.jstuff` (package amd Maven group)
+### Removed
+- `.travis.yml`
+
 ## [1.9] - 2024-02-18
 ### Changed
 - `pom.xml`: bumped dependency version

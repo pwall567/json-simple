@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package net.pwall.json.parser.test;
+package io.jstuff.json.parser.test;
 
 import java.util.List;
 import java.util.Map;
@@ -33,11 +33,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
-import net.pwall.json.parser.ParseException;
-import net.pwall.json.parser.ParseOptions;
-import net.pwall.json.parser.ParseOptions.DuplicateKeyOption;
-import net.pwall.json.parser.Parser;
-import static net.pwall.json.parser.Parser.MAX_DEPTH_EXCEEDED;
+import io.jstuff.json.parser.ParseException;
+import io.jstuff.json.parser.ParseOptions;
+import io.jstuff.json.parser.ParseOptions.DuplicateKeyOption;
+import io.jstuff.json.parser.Parser;
+import static io.jstuff.json.parser.Parser.MAX_DEPTH_EXCEEDED;
 
 public class ParserObjectTest {
 

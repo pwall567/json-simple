@@ -23,12 +23,12 @@
  * SOFTWARE.
  */
 
-package net.pwall.json;
+package io.jstuff.json;
 
 import java.io.IOException;
 
-import net.pwall.json.format.Formatter;
-import net.pwall.json.parser.Parser;
+import io.jstuff.json.format.Formatter;
+import io.jstuff.json.parser.Parser;
 
 /**
  * A set of static functions to access simple JSON functionality - a parser that converts JSON into a structure

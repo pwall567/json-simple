@@ -23,14 +23,14 @@
  * SOFTWARE.
  */
 
-package net.pwall.json.parser.test;
+package io.jstuff.json.parser.test;
 
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-import net.pwall.json.parser.ParseException;
-import net.pwall.json.parser.Parser;
+import io.jstuff.json.parser.ParseException;
+import io.jstuff.json.parser.Parser;
 
 public class ParserStringTest {
 
