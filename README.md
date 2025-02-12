@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/pwall567/json-simple/actions/workflows/build.yml/badge.svg)](https://github.com/pwall567/json-simple/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Maven Central](https://img.shields.io/maven-central/v/io.jstuff/json-simple?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.jstuff%22%20AND%20a:%22json-simple%22)
+[![Maven Central](https://img.shields.io/maven-central/v/io.jstuff/json-simple?label=Maven%20Central)](https://central.sonatype.com/artifact/io.jstuff/json-simple)
 
 Simple JSON Parser and Formatter
 
